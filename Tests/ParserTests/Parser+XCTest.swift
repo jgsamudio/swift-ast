@@ -171,13 +171,13 @@ func parseProblematic(
     }
   }
 
-  DiagnosticPool.shared.clear()
+//  DiagnosticPool.shared.clear()
   do {
     _ = try getParser(content).parse()
   } catch {}
 
   let diagnosticConsumer = TestParserDiagnosticConsumer()
-  DiagnosticPool.shared.report(withConsumer: diagnosticConsumer)
+//  DiagnosticPool.shared.report(withConsumer: diagnosticConsumer)
   let diagnostics = diagnosticConsumer.diagnostics
   switch diagnostics.count {
   case 0:

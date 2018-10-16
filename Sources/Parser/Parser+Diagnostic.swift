@@ -30,7 +30,7 @@ extension Parser {
   }
 
   var _diagnosticPool: DiagnosticPool {
-    return .shared
+    return DiagnosticPool()
   }
 }
 

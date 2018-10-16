@@ -39,7 +39,7 @@ func runGitHubIssueGen(for filePaths: [String]) -> Int32 {
     let source = try SourceReader.read(at: filePath)
     sourceFile = source
 
-    DiagnosticPool.shared.clear()
+//    DiagnosticPool.shared.clear()
     let parser = Parser(source: source)
     _ = try parser.parse()
 
@@ -53,7 +53,7 @@ func runGitHubIssueGen(for filePaths: [String]) -> Int32 {
     flush(content, to: outputPath)
   } catch {
     let diagnosticExtractor = DiagnosticExtractor()
-    DiagnosticPool.shared.report(withConsumer: diagnosticExtractor)
+//    DiagnosticPool.shared.report(withConsumer: diagnosticExtractor)
     let diagnostics = diagnosticExtractor.diagnostics
     let content = genForParserError(
       sourceFile: sourceFile, diagnostics: diagnostics

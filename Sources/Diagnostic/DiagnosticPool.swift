@@ -21,66 +21,56 @@ public struct DiagnosticStopper : Error { // TODO: need a better way to stop the
 }
 
 public class DiagnosticPool {
-  public static let shared = DiagnosticPool()
 
-  private var _diagnostics: [Diagnostic] = []
-  private var _checkpoints: [String: [Diagnostic]] = [:]
+    private var _diagnostics: [Diagnostic] = []
+    private var _checkpoints: [String: [Diagnostic]] = [:]
 
-  public func appendFatal(
-    kind: DiagnosticKind, sourceLocatable: SourceLocatable
-  ) -> Error {
-    _append(.fatal, kind, sourceLocatable)
-    return DiagnosticStopper()
-  }
+    public init() { }
 
-  public func appendError(
-    kind: DiagnosticKind, sourceLocatable: SourceLocatable
-  ) throws {
-    _append(.error, kind, sourceLocatable)
-    if _diagnostics.filter({ $0.level == .error }).count >= 10 {
-      throw DiagnosticStopper()
+    public func appendFatal(kind: DiagnosticKind, sourceLocatable: SourceLocatable) -> Error {
+        _append(.fatal, kind, sourceLocatable)
+        return DiagnosticStopper()
     }
-  }
 
-  public func appendWarning(
-    kind: DiagnosticKind, sourceLocatable: SourceLocatable
-  ) throws {
-    _append(.warning, kind, sourceLocatable)
-    if _diagnostics.filter({ $0.level == .warning }).count >= 50 {
-      throw DiagnosticStopper()
+    public func appendError(kind: DiagnosticKind, sourceLocatable: SourceLocatable) throws {
+        _append(.error, kind, sourceLocatable)
+        if _diagnostics.filter({ $0.level == .error }).count >= 10 {
+          throw DiagnosticStopper()
+        }
     }
-  }
 
-  private func _append(
-    _ level: Diagnostic.Level,
-    _ kind: DiagnosticKind,
-    _ source: SourceLocatable
-  ) {
-    let diagnostic = Diagnostic(
-      level: level, kind: kind, location: source.sourceLocation)
-    _diagnostics.append(diagnostic)
-  }
-
-  public func report(withConsumer consumer: DiagnosticConsumer) {
-    consumer.consume(diagnostics: _diagnostics)
-    clear()
-  }
-
-  public func clear() {
-    DiagnosticPool.shared._diagnostics = []
-  }
-
-  public func checkPoint() -> String {
-    let id = UUID().uuidString
-    _checkpoints[id] = _diagnostics
-    return id
-  }
-
-  @discardableResult public func restore(fromCheckpoint cpId: String) -> Bool {
-    guard let loadedDiagnostics = _checkpoints[cpId] else {
-      return false
+    public func appendWarning(kind: DiagnosticKind, sourceLocatable: SourceLocatable) throws {
+        _append(.warning, kind, sourceLocatable)
+        if _diagnostics.filter({ $0.level == .warning }).count >= 50 {
+          throw DiagnosticStopper()
+        }
     }
-    DiagnosticPool.shared._diagnostics = loadedDiagnostics
-    return true
-  }
+
+    private func _append(_ level: Diagnostic.Level, _ kind: DiagnosticKind, _ source: SourceLocatable) {
+        let diagnostic = Diagnostic(level: level, kind: kind, location: source.sourceLocation)
+        _diagnostics.append(diagnostic)
+    }
+
+    public func report(withConsumer consumer: DiagnosticConsumer) {
+        consumer.consume(diagnostics: _diagnostics)
+        clear()
+    }
+
+    public func clear() {
+        _diagnostics = []
+    }
+
+    public func checkPoint() -> String {
+        let id = UUID().uuidString
+        _checkpoints[id] = _diagnostics
+        return id
+    }
+
+    @discardableResult public func restore(fromCheckpoint cpId: String) -> Bool {
+        guard let loadedDiagnostics = _checkpoints[cpId] else {
+          return false
+        }
+        _diagnostics = loadedDiagnostics
+        return true
+    }
 }

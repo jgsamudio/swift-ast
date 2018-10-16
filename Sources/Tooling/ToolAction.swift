@@ -32,7 +32,7 @@ open class ToolAction {
     var unparsedSourceFiles: [SourceFile] = []
 
     for sourceFile in sourceFiles {
-      DiagnosticPool.shared.clear()
+//      DiagnosticPool.shared.clear()
 
       let parser = Parser(source: sourceFile)
       if let topLevelDecl = try? parser.parse() {
@@ -41,7 +41,7 @@ open class ToolAction {
         unparsedSourceFiles.append(sourceFile)
       }
 
-      DiagnosticPool.shared.report(withConsumer: diagnosticConsumer)
+//      DiagnosticPool.shared.report(withConsumer: diagnosticConsumer)
     }
 
     guard unparsedSourceFiles.isEmpty else {

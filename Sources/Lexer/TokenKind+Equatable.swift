@@ -14,10 +14,7 @@
    limitations under the License.
 */
 
-extension Token.Kind: Equatable {
-  public static func ==(lhs: Token.Kind, rhs: Token.Kind) -> Bool {
-    return lhs.isEqual(to: rhs)
-  }
+extension Token.Kind {
 
   public func isEqual(toKindOf kind: Token.Kind) -> Bool {
     switch (self, kind) {
@@ -142,7 +139,7 @@ extension Token.Kind: Equatable {
   }
 
   public func isEqual(to kind: Token.Kind) -> Bool { // swift-lint:rule_configure(CYCLOMATIC_COMPLEXITY=18)
-    guard isEqual(toKindOf: kind) else {
+    guard self == kind else {
       return false
     }
 
